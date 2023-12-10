@@ -4,6 +4,12 @@
 
 - Windowsのみ対応
 
+# ダウンロード
+
+ここから好きなバージョンをダウンロードしてください。
+
+https://github.com/ikasoba/nicomment/releases
+
 # 設定
 
 実行ファイルと同じディレクトリの`port.txt`に好きなポート番号を書くとそのポート番号で起動します。
