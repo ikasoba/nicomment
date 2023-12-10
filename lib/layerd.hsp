@@ -1,0 +1,6 @@
+#include "user32.as"
+
+#define WS_EX_LAYERED 0x00080000
+#define setLayerdWindow(%1) SetWindowLongA %1, -20, WS_EX_LAYERED
+
+#define setTransparentColor(%1,%2,%3) SetLayeredWindowAttributes hwnd, %1 << 16 | %2 << 8 | %3, 0, 0x00000001

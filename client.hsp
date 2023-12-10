@@ -1,0 +1,35 @@
+#packopt name "nicomment_client"
+
+#include "hspsock.as"
+
+  id = 0
+
+  port = "3214"
+
+  mes "port: ", 1
+  input port, 100, 20, 4
+
+  button "connect", *connect
+
+  stop
+
+*connect
+  cls
+  sockopen id, "127.0.0.1", int(port)
+  if stat != 0 {
+	  dialog "" + stat, 1
+	  end
+	}
+
+  pos 0, 0
+  text = ""
+  input text, 100, 20
+
+  button "send", *send
+  stop
+
+*send
+  len = strlen(text)
+  sockputb len, 0, 4, id
+  sockputb text, 0, len, id
+  stop

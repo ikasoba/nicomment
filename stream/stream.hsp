@@ -1,0 +1,102 @@
+//
+// TCPで文字列データを送るだけのプロトコル
+//
+
+#include "hspsock.as"
+
+#ifndef __stream__
+
+#define __stream__
+
+  dim socket_port@stream
+  socket_port = 3214
+
+	dim socket_offset@stream
+	dim socket_length@stream
+
+	socket_offset@stream = 0
+
+  // 同時に接続できる数
+	socket_length@stream = 10
+
+	dim socket_stats@stream, socket_length@stream
+
+	ldim handler@stream
+
+	sdim received_text@stream
+
+#module stream
+
+#defcfunc get_text
+  return received_text
+
+#deffunc stream_handle label l
+  handler = l
+  return
+
+#deffunc stream_tick int id
+  sockcheck@ id
+  if stat != 0 { return }
+
+  dim len, 4
+  sockgetb@ len, 0, 4, id
+  if len <= 0 | stat == 0 { return }
+  logmes "len " + len
+
+  sdim buf, len
+
+  dim receive_size
+
+  repeat
+    logmes "len " + receive_size
+    if receive_size >= len {
+      break
+    }
+
+    sockgetb@ buf, receive_size, len - receive_size, id
+    receive_size += stat
+
+    await
+  loop
+
+  received_text = buf
+  gosub handler
+
+  return
+
+#deffunc stream_init int port, int offset, int max
+  socket_port = port
+  socket_offset = offset
+  socket_length = max
+
+  logmes "sockmake " + cnt + ", " + socket_port
+  sockmake@ socket_offset, socket_port
+  if stat != 0 {
+    dialog "sockmake error - " + stat, 1
+    end 1
+  }
+  return
+
+#deffunc stream_listen
+  repeat socket_length, socket_offset
+    status = socket_stats(cnt)
+    if status == 0 {
+      sockwait@ socket_offset, cnt
+      if stat == 0 {
+        logmes "connect " + cnt
+        socket_stats(cnt) = 1
+      } else:if stat == 1 | stat == 3 {
+        continue
+      } else {
+        dialog "sockwait error - " + stat, 1
+        end 1
+      }
+    } else {
+      stream_tick cnt
+    }
+  loop
+  return
+
+#global
+
+#endif

@@ -1,0 +1,95 @@
+#packopt name "nicomment"
+
+#include "./lib/layerd.hsp"
+#include "./stream/stream.hsp"
+
+  notesel _port
+  noteload "./port.txt"
+
+  port = int(_port)
+
+  bgscr 0, ginfo_dispx, ginfo_dispy, 0, 0, 0
+  gsel 0, 2
+
+	setLayerdWindow hwnd
+
+	color 254, 254, 254
+	boxf
+
+	setTransparentColor 254, 254, 254
+
+  sdim textDatas
+  ddim texts, 100, 3
+
+  stream_init 3214, 0, 10
+  stream_handle *add_text
+
+  dialog "port: " + port
+
+  prev_time = get_time()
+  repeat
+    cur_time = get_time()
+    if cur_time - prev_time <= 0 {
+      fps = 60.0
+    } else {
+      fps = 1000.0 / double(cur_time - prev_time)
+    }
+
+    if cnt \ 10 == 0 {
+      stream_listen
+    }
+
+    redraw 0
+
+    pos 0, 0
+    color 254, 254, 254
+  	boxf
+
+    color 0, 0, 0
+    objcolor 253, 253, 253
+    font "", 28, 0, 2
+
+    foreach texts
+      id = int(texts(cnt, 0))
+      x = texts(cnt, 1)
+      y = texts(cnt, 2)
+      if id <= 0 { continue }
+
+      if (x < ginfo_dispx) & (y < ginfo_dispy) {
+        pos x, y
+        mes textDatas(id), 4
+      }
+
+      if x < -ginfo_mesx {
+        texts(cnt, 0) = 0.0
+        textDatas(id) = ""
+        continue
+      }
+
+      texts(cnt, 1) -= 1.0 * (fps / 20.0)
+    loop
+
+    redraw 1
+
+    prev_time = cur_time
+
+    await 16
+  loop
+
+*add_text
+  logmes length(texts)
+  foreach texts
+    if texts(cnt, 0) == 0 {
+      id = length(textDatas)
+      textDatas(id) = get_text()
+      texts(cnt, 0) = double(id)
+      texts(cnt, 1) = double(ginfo_winx + rnd(100))
+      texts(cnt, 2) = double(rnd(ginfo_winy / 28) * 28)
+      is_assgined = 1
+      break
+    }
+  loop
+  return
+
+#defcfunc get_time
+  return ((gettime(4) * 60 + gettime(5)) * 60 + gettime(6)) * 1000 + gettime(7)
