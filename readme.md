@@ -23,3 +23,9 @@ https://github.com/ikasoba/nicomment/releases
 nicommentが動いてるポート(デフォルトでは`3214`)にTCPで接続し、文字列のバイト数(32bit符号付き整数)とその文字列を送信するとその文字列が画面上に表示されます。
 
 また、文字コードはsjisのみ対応しています。
+
+# クライアント一覧
+
+- peertube用クライアント
+
+  https://github.com/ikasoba/nicomment-peertube-livechat
